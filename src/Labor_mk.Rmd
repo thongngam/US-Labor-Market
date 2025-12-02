@@ -1,0 +1,29 @@
+---
+title: "Analyzing Data"
+author: "Arisa Thongngam"
+date: "2025-12-01"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+
+```
+
+
+```{r, include = FALSE}
+#CPI data for calculating inflation rate
+#Real GDP for GDP growth (%change) (data comes in Quartery so convert the frequency to monthly)
+#Women LFPR
+#Men LFPR
+#Unemployment rate
+#Consider lag 1 for last year effect on this year
+#Include year as a covariate
+#Population growth or mortality rate
+
+
+
+```
+
