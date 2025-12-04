@@ -1,15 +1,21 @@
 ---
-title: "Analyzing Data"
+title: "US Labor Market"
 author: "Arisa Thongngam"
 date: "2025-12-01"
 output: pdf_document
 ---
 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+#install.packages("fredr")
+install.packages(c("tidyr", "lubridate", "purrr"))
 library(dplyr)
 library(ggplot2)
-
+library(lubridate)
+library(tidyr)
+library(purrr)
+#library(fredr)
 ```
 
 
@@ -23,7 +29,61 @@ library(ggplot2)
 #Include year as a covariate
 #Population growth or mortality rate
 
+```
+
+```{r, include = FALSE}
+getwd()
+#Reading data
+CPI <- read.csv("data/CPI.csv")
+GDP <- read.csv("data/GDP.csv")
+MLFPR <- read.csv("data/MLFPR.csv")
+WLFPR <- read.csv("data/WLFPR.csv")
+UNRATE <- read.csv("data/UNRATE.csv")
+
+head(MLFPR)
+tail(CPI)
+
+#Renaming observations
+CPI <- CPI %>%
+  rename(CPI = CPILFESL)
+
+GDP <- GDP %>%
+  rename(GDP = GDPC1)
+
+MLFPR <- MLFPR %>%
+  rename(MLFPR = Value)
+
+WLFPR <- WLFPR %>%
+  rename(WLFPR = Value)
+
+UNRATE <- UNRATE %>%
+  rename(UNRATE = Value)
 
 
+#Converting the class of date from character to date.time
+GDP$observation_date <- as.Date(GDP$observation_date)
+class(GDP$observation_date)
+#Converting GDP from Quarterly to Monthly
+GDP_M <- GDP %>%
+  #Adding a "month_seq" column
+  #For each quarterly date, return a vector of three monthly dates
+  mutate(month_seq = map(observation_date, ~ seq(.x, by = "1 month", length.out = 3))) %>%
+  unnest(month_seq) %>%
+  #Delete original observation date column
+  select(-observation_date) %>% 
+  #Rename the month_aeq column to "observation_date"
+  rename(observation_date = month_seq) %>%
+  #Sorting observation_date in a chronological order
+  arrange(observation_date)
+head(GDP_M)
+
+#Merging
+df1 <- CPI %>% 
+head(df1)
+
+
+
+head(UNRATE)
+#df1 <- 
 ```
 
