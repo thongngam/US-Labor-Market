@@ -77,9 +77,29 @@ GDP_M <- GDP %>%
   arrange(observation_date)
 head(GDP_M)
 
+CPI <- CPI[-c(247:249), ]
+MLFPR <- MLFPR[-c(247:249), ]
+WLFPR <- WLFPR[-c(247:249), ]
+UNRATE <- UNRATE[-c(247:249), ]
+
+CPI$observation_date <- as.Date(CPI$observation_date)
+MLFPR$observation_date <- CPI$observation_date
+WLFPR$observation_date <- CPI$observation_date
+UNRATE$observation_date <- CPI$observation_date
+
 #Merging
-df1 <- CPI %>% 
+df1 <- CPI %>%
+  left_join(MLFPR %>% select(observation_date, MLFPR),
+            by = "observation_date") %>%
+  left_join(WLFPR %>% select(observation_date, WLFPR),
+            by = "observation_date") %>%
+  left_join(UNRATE %>% select(observation_date, UNRATE),
+            by = "observation_date") %>%
+  left_join(GDP_M %>% select(observation_date, GDPC1),
+            by = "observation_date")
+  
 head(df1)
+  
 
 
 
