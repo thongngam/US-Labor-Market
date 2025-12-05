@@ -77,33 +77,135 @@ GDP_M <- GDP %>%
   arrange(observation_date)
 head(GDP_M)
 
+#Removing row 247-249 so that all variables have 246 observations
 CPI <- CPI[-c(247:249), ]
 MLFPR <- MLFPR[-c(247:249), ]
 WLFPR <- WLFPR[-c(247:249), ]
 UNRATE <- UNRATE[-c(247:249), ]
 
+#Creating an observation_date column so that all data frames have a common column
 CPI$observation_date <- as.Date(CPI$observation_date)
 MLFPR$observation_date <- CPI$observation_date
 WLFPR$observation_date <- CPI$observation_date
 UNRATE$observation_date <- CPI$observation_date
 
-#Merging
+#Merging by the "observation_date" column
 df1 <- CPI %>%
   left_join(MLFPR %>% select(observation_date, MLFPR),
             by = "observation_date") %>%
   left_join(WLFPR %>% select(observation_date, WLFPR),
             by = "observation_date") %>%
-  left_join(UNRATE %>% select(observation_date, UNRATE),
+  left_join(UNRATE %>% select(observation_date, UNRATE, Year),
             by = "observation_date") %>%
   left_join(GDP_M %>% select(observation_date, GDPC1),
             by = "observation_date")
   
 head(df1)
-  
-
-
-
-head(UNRATE)
-#df1 <- 
 ```
+
+
+```{r}
+#Create an empty vector for inflation
+INF_RATE <- numeric(nrow(df1))
+
+#Loop to calculate inflation rate using percentage change in CPI
+for (i in 2:nrow(df1)) {
+  INF_RATE[i] <- ((df1$CPI[i] - df1$CPI[i-1]) / df1$CPI[i-1]) * 100
+}
+
+#Append to dataframe
+df1$INF_RATE <- INF_RATE
+
+
+#Creating GDP growth
+
+head(df1)
+
+
+```
+
+
+```{r}
+#Plotting each series
+#Unemployment rate
+UNRATE_g <- ggplot(data = df1,
+                   mapping = aes(x = observation_date, 
+                                 y = UNRATE)) +
+  geom_line(linewidth = 0.8) +
+  labs(x = "Year",
+       y = "Unemployment Rate (%)",
+       title = "U.S. Unemployment Rate (2005-2025)") +
+  theme_bw()
+
+#save the plot
+ggsave(UNRATE_g, 
+       filename = "UNRATE_g.png",
+       device = "png")
+
+#Men Labor Force Participation Rate
+MLFPR_g <- ggplot(data = df1,
+                   mapping = aes(x = observation_date, 
+                                 y = MLFPR)) +
+  geom_line(linewidth = 0.8) +
+  labs(x = "Year",
+       y = "Men Labor Force Participation Rate (%)",
+       title = "Men Labor Force Participation Rate in the U.S. (2005-2025)") +
+  theme_bw()
+
+#save the plot
+ggsave(MLFPR_g, 
+       filename = "MLFPR_g.png",
+       device = "png")
+
+#Women Labor Force Participation Rate
+WLFPR_g <- ggplot(data = df1,
+                   mapping = aes(x = observation_date, 
+                                 y = WLFPR)) +
+  geom_line(linewidth = 0.8) +
+  labs(x = "Year",
+       y = "Women Labor Force Participation Rate (%)",
+       title = "Women Labor Force Participation Rate in the U.S. (2005-2025)") +
+  theme_bw()
+
+#save the plot
+ggsave(WLFPR_g, 
+       filename = "WLFPR_g.png",
+       device = "png")
+
+#Monthly Inflation Rate
+INFR_g <- ggplot(data = df1,
+                   mapping = aes(x = observation_date, 
+                                 y = INF_RATE)) +
+  geom_line(linewidth = 0.8) +
+  labs(x = "Year",
+       y = "Inflation Rate (%)",
+       title = "Inflation Rate in the U.S. (2005-2025)") +
+  theme_bw()
+
+#save the plot
+ggsave(INFR_g, 
+       filename = "INFR_g.png",
+       device = "png")
+
+#Real GDP
+GDP_g <- ggplot(data = GDP,
+                   mapping = aes(x = observation_date, 
+                                 y = GDPC1)) +
+  geom_line(linewidth = 0.8) +
+  labs(x = "Year",
+       y = "GDP",
+       title = "U.S. Gross Domestic Product (2005-2025)") +
+  theme_bw()
+
+#save the plot
+ggsave(GDP_g, 
+       filename = "GDP_g.png",
+       device = "png")
+
+
+
+
+
+```
+
 
